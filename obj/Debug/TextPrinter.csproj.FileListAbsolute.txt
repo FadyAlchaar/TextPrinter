@@ -24,3 +24,4 @@ G:\CSharp Projects\TextPrinter\obj\Debug\TextPrinter.csproj.CoreCompileInputs.ca
 G:\CSharp Projects\TextPrinter\obj\Debug\TextPrin.20BCE42D.Up2Date
 G:\CSharp Projects\TextPrinter\obj\Debug\TextPrinter.exe
 G:\CSharp Projects\TextPrinter\obj\Debug\TextPrinter.pdb
+G:\CSharp Projects\TextPrinter\obj\Debug\TextPrinter.exe.config

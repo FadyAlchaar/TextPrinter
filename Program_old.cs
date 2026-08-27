@@ -4,7 +4,6 @@ using System.Drawing.Printing;
 using System.IO;
 using System.Text;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 
 namespace TextPrinter
 {
@@ -21,11 +20,6 @@ namespace TextPrinter
 
     class Program
     {
-        // Covers Arabic, Arabic Supplement, Arabic Extended-A, and the
-        // Arabic Presentation Forms blocks (common in some fonts/legacy text).
-        private static readonly Regex ArabicRegex = new Regex(
-            @"[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]");
-
         static int Main(string[] args)
         {
             if (args.Length < 2)
@@ -85,37 +79,19 @@ namespace TextPrinter
             pd.PrintPage += (sender, e) =>
             {
                 float leftMargin = config.LeftMargin;
-                float rightMargin = config.RightMargin;
                 float topMargin = config.TopMargin;
                 float lineHeight = font.GetHeight(e.Graphics) + config.LineSpacing;
                 float y = topMargin;
-                float lineWidth = e.MarginBounds.Width - leftMargin - rightMargin;
-                if (lineWidth < 0) lineWidth = 0;
+                int count = 0;
 
                 using (StringReader reader = new StringReader(text))
                 {
                     string line;
                     while ((line = reader.ReadLine()) != null)
                     {
-                        if (ArabicRegex.IsMatch(line))
-                        {
-                            // Right-to-left paragraph direction + right alignment,
-                            // so Arabic lines read naturally instead of drawing
-                            // left-aligned/left-to-right like plain DrawString does.
-                            RectangleF lineRect = new RectangleF(leftMargin, y, lineWidth, lineHeight);
-                            using (StringFormat sf = new StringFormat(StringFormatFlags.DirectionRightToLeft))
-                            {
-                                // With DirectionRightToLeft, Near = right edge (reading start for RTL).
-                                sf.Alignment = StringAlignment.Near;
-                                e.Graphics.DrawString(line, font, Brushes.Black, lineRect, sf);
-                            }
-                        }
-                        else
-                        {
-                            e.Graphics.DrawString(line, font, Brushes.Black, leftMargin, y);
-                        }
-
+                        e.Graphics.DrawString(line, font, Brushes.Black, leftMargin, y);
                         y += lineHeight;
+                        count++;
 
                         // Check for page overflow (optional)
                         if (y + lineHeight > e.MarginBounds.Bottom)
